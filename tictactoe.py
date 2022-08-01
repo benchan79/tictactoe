@@ -173,36 +173,42 @@ def utility(board):
 
     raise NotImplementedError
 
-def max_value(board):
-    # Function to find the max value for given board
+def max_value(board, alpha, beta):
+    # Function to find max value of board with alpha-beta pruning
     
-    # Initiate the value of the board as negative infinity
+    # Initialize value of board as negative infinity
     v = -float("inf")
 
     # If game has ended, return its utility value
     if terminal(board):
         return utility(board)
 
-    # Iterate through all possible actions to find the max value
+    # Go through all possible actions to find max value
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
-    
+        v_min = min_value(result(board, action), alpha, beta)
+        v = max(v, v_min)
+        if v_min >= beta:
+            return v
+        alpha = max(alpha, v_min)
     return v
 
-def min_value(board):
-    # Function to find the min value for given board
+def min_value(board, alpha, beta):
+    # Function to find max value of board with alpha-beta pruning
     
-    # Initiate the value of the board as positive infinity
+    # Initialize the value of board as positive infinity
     v = float("inf")
     
-    # If game has ended, return its utility value
+     # If game has ended, return its utility value
     if terminal(board):
         return utility(board)
     
-    # Iterate through all possible actions to find the min value
+    # Go through all possible actions to find max value
     for action in actions(board):
-        v = min(v, max_value(result(board, action)))
-    
+        v_max = max_value(result(board, action), alpha, beta)
+        v = min(v, v_max)
+        if v_max <= alpha:
+            return v
+        beta = min(beta, v_max)
     return v
 
 def minimax(board):
@@ -218,7 +224,7 @@ def minimax(board):
         # Go through every possible action
         for action in actions(board):
             # Let v = to value of player O's best action for given board and action
-            v = min_value(result(board, action))
+            v = min_value(result(board, action), -float("inf"), float("inf"))
             # If player O's v is greater than player X's best_v, assign best_v to v and best_action to that particular action
             if v > best_v:
                 best_v = v
@@ -233,8 +239,8 @@ def minimax(board):
         # Go through every possible action        
         for action in actions(board):
             # Let v = to value of player X's best action for given board and action
-            v = max_value(result(board, action))
-            # If player X's v is smalled than player O's best_v, assign best_v to v and best_action to that particular action
+            v = max_value(result(board, action), -float("inf"), float("inf"))
+            # If player X's v is smaller than player O's best_v, assign best_v to v and best_action to that particular action
             if v < best_v:
                 best_v = v
                 best_action = action
